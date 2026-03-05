@@ -38,7 +38,7 @@ pub fn move_player(
         facing_direction = Vec2::new(1.0, 0.0);
     }
 
-    if let Ok((mut player_transform, mut animation, mut player)) = player_query.get_single_mut() {
+    if let Ok((mut player_transform, mut animation, mut player)) = player_query.single_mut() {
         if keyboard_input.pressed(KeyCode::ArrowUp) {
             player_transform.scale.y = 4.3; // Slight stretch when moving up
         } else if keyboard_input.pressed(KeyCode::ArrowDown) {
@@ -55,20 +55,20 @@ pub fn move_player(
             player.facing_direction = facing_direction;
 
             // Only change to running animation if not attacking
-            if animation.attack_timer.finished() {
+            if animation.attack_timer.is_finished() {
                 animation.first_frame = 12;
                 animation.last_frame = 17;
             }
         } else {
             // Only change to idle animation if not attacking
-            if animation.attack_timer.finished() {
+            if animation.attack_timer.is_finished() {
                 animation.first_frame = 0;
                 animation.last_frame = 3;
             }
         }
 
         // Update the camera's position to follow the player
-        if let Ok(mut camera_transform) = camera_query.get_single_mut() {
+        if let Ok(mut camera_transform) = camera_query.single_mut() {
             camera_transform.translation.x = player_transform.translation.x;
             camera_transform.translation.y = player_transform.translation.y;
         }
@@ -89,7 +89,7 @@ pub fn move_fireballs(
         fb_transform.translation += Vec3::from((fb.direction * speed * time.delta_secs(), 0.0));
 
         // Despawn if fireball moves too far from the player
-        let Ok(pl_transform) = pl_query.get_single() else {
+        let Ok(pl_transform) = pl_query.single() else {
             continue;
         };
         if fb_transform.translation.distance(pl_transform.translation) > 1000.0 {
@@ -106,7 +106,7 @@ pub fn move_orbs(
     enemy_query: Query<&Transform, (With<Enemy>, Without<Orb>, Without<Player>)>,
     time: Res<Time>,
 ) {
-    let Ok(pl_transform) = pl_query.get_single() else {
+    let Ok(pl_transform) = pl_query.single() else {
         return;
     };
     for (orb_entity, mut orb_transform, mut orb) in &mut orb_query {

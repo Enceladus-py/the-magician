@@ -33,7 +33,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(ClearColor(Color::srgb(0.1, 0.1, 0.1)))
-        .add_event::<LevelUpEvent>()
+        .add_message::<LevelUpEvent>()
         .init_resource::<EnemySpawnTimer>()
         .init_resource::<GameTimer>()
         .init_state::<GameState>()
@@ -56,11 +56,14 @@ fn main() {
                 update_hud,
                 update_weapon_hud,
             )
+                .into_configs()
                 .run_if(in_state(GameState::Playing)),
         )
         .add_systems(
             Update,
-            transition_to_levelup.run_if(in_state(GameState::Playing)),
+            transition_to_levelup
+                .into_configs()
+                .run_if(in_state(GameState::Playing)),
         )
         .add_systems(OnEnter(GameState::LevelUp), spawn_levelup_menu)
         .add_systems(

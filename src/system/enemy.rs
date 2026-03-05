@@ -45,7 +45,7 @@ pub fn spawn_enemies(
     if !spawn_timer.0.just_finished() {
         return;
     }
-    let Ok(player_transform) = player_query.get_single() else {
+    let Ok(player_transform) = player_query.single() else {
         return;
     };
     let mut rng = rand::thread_rng();
@@ -72,7 +72,7 @@ pub fn move_enemies(
     player_query: Query<&Transform, (With<Player>, Without<Enemy>)>,
     time: Res<Time>,
 ) {
-    let Ok(player_transform) = player_query.get_single() else {
+    let Ok(player_transform) = player_query.single() else {
         return;
     };
     for (mut enemy_transform, mut enemy) in &mut enemy_query {

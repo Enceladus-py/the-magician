@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy::prelude::*; // Added based on user instruction
+// Try to use the trait-based approach if ChildBuilder is hard to find
+// or find its exact path.
 
 use crate::{
     GameState,
@@ -75,7 +77,7 @@ pub fn spawn_hud(mut commands: Commands) {
                         overflow: Overflow::clip(),
                         ..Default::default()
                     },
-                    BorderColor(Color::srgb(0.5, 0.15, 0.15)),
+                    BorderColor::all(Color::srgb(0.5, 0.15, 0.15)),
                     BackgroundColor(Color::srgba(0.1, 0.0, 0.0, 0.8)),
                 ))
                 .with_children(|track| {
@@ -116,7 +118,7 @@ pub fn spawn_hud(mut commands: Commands) {
                         overflow: Overflow::clip(),
                         ..Default::default()
                     },
-                    BorderColor(Color::srgb(0.2, 0.1, 0.4)),
+                    BorderColor::all(Color::srgb(0.2, 0.1, 0.4)),
                     BackgroundColor(Color::srgba(0.05, 0.0, 0.1, 0.8)),
                 ))
                 .with_children(|track| {
@@ -139,23 +141,23 @@ pub fn update_hud(
     mut hp_query: Query<&mut Node, (With<HealthBarFill>, Without<XpBarFill>)>,
     mut xp_query: Query<&mut Node, (With<XpBarFill>, Without<HealthBarFill>)>,
 ) {
-    let Ok((health, stats)) = player_query.get_single() else {
+    let Ok((health, stats)) = player_query.single() else {
         return;
     };
 
     let hp_pct = (health.0 / PLAYER_MAX_HEALTH * 100.0).clamp(0.0, 100.0);
     let xp_pct = (stats.current_xp / stats.required_xp * 100.0).clamp(0.0, 100.0);
 
-    if let Ok(mut node) = hp_query.get_single_mut() {
+    if let Ok(mut node) = hp_query.single_mut() {
         node.width = Val::Percent(hp_pct);
     }
-    if let Ok(mut node) = xp_query.get_single_mut() {
+    if let Ok(mut node) = xp_query.single_mut() {
         node.width = Val::Percent(xp_pct);
     }
 }
 
 // ── Weapon cooldown HUD (bottom-right) ──────────────────────────────────────
-
+#[allow(clippy::too_many_lines)]
 pub fn spawn_weapon_hud(mut commands: Commands) {
     commands
         .spawn(Node {
@@ -168,12 +170,41 @@ pub fn spawn_weapon_hud(mut commands: Commands) {
         })
         .with_children(|root| {
             // ── Orb card ───────────────────────────────────────────────────
-            weapon_card(
-                root,
-                "ORB",
-                Color::srgb(0.2, 0.55, 1.0),
-                Color::srgb(0.2, 0.5, 1.0),
-                |track| {
+            root.spawn(Node {
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: Val::Px(6.0),
+                ..Default::default()
+            })
+            .with_children(|row| {
+                row.spawn((
+                    Node {
+                        width: Val::Px(12.0),
+                        height: Val::Px(12.0),
+                        ..Default::default()
+                    },
+                    BackgroundColor(Color::srgb(0.2, 0.55, 1.0)),
+                ));
+                row.spawn((
+                    Text::new("ORB"),
+                    TextFont {
+                        font_size: 13.0,
+                        ..Default::default()
+                    },
+                    TextColor(Color::WHITE),
+                ));
+                row.spawn((
+                    Node {
+                        width: Val::Px(120.0),
+                        height: Val::Px(12.0),
+                        border: UiRect::all(Val::Px(2.0)),
+                        overflow: Overflow::clip(),
+                        ..Default::default()
+                    },
+                    BorderColor::all(Color::srgb(0.2, 0.5, 1.0)),
+                    BackgroundColor(Color::srgba(0.05, 0.05, 0.05, 0.8)),
+                ))
+                .with_children(|track| {
                     track.spawn((
                         Node {
                             width: Val::Percent(100.0),
@@ -183,16 +214,45 @@ pub fn spawn_weapon_hud(mut commands: Commands) {
                         BackgroundColor(Color::srgb(0.2, 0.55, 1.0)),
                         OrbCooldownFill,
                     ));
-                },
-            );
+                });
+            });
 
             // ── Fireball card ──────────────────────────────────────────────
-            weapon_card(
-                root,
-                "FIREBALL",
-                Color::srgb(1.0, 0.4, 0.05),
-                Color::srgb(0.5, 0.2, 0.1),
-                |track| {
+            root.spawn(Node {
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: Val::Px(6.0),
+                ..Default::default()
+            })
+            .with_children(|row| {
+                row.spawn((
+                    Node {
+                        width: Val::Px(12.0),
+                        height: Val::Px(12.0),
+                        ..Default::default()
+                    },
+                    BackgroundColor(Color::srgb(1.0, 0.4, 0.05)),
+                ));
+                row.spawn((
+                    Text::new("FIREBALL"),
+                    TextFont {
+                        font_size: 13.0,
+                        ..Default::default()
+                    },
+                    TextColor(Color::WHITE),
+                ));
+                row.spawn((
+                    Node {
+                        width: Val::Px(120.0),
+                        height: Val::Px(12.0),
+                        border: UiRect::all(Val::Px(2.0)),
+                        overflow: Overflow::clip(),
+                        ..Default::default()
+                    },
+                    BorderColor::all(Color::srgb(0.5, 0.2, 0.1)),
+                    BackgroundColor(Color::srgba(0.05, 0.05, 0.05, 0.8)),
+                ))
+                .with_children(|track| {
                     track.spawn((
                         Node {
                             width: Val::Percent(0.0),
@@ -202,58 +262,8 @@ pub fn spawn_weapon_hud(mut commands: Commands) {
                         BackgroundColor(Color::srgb(1.0, 0.4, 0.05)),
                         FireballChargeFill,
                     ));
-                },
-            );
-        });
-}
-
-/// Spawns one weapon card row: colored-square icon + label + a 140x12 bar track.
-fn weapon_card(
-    parent: &mut ChildBuilder,
-    label: &str,
-    icon_color: Color,
-    border_color: Color,
-    fill_fn: impl FnOnce(&mut ChildBuilder),
-) {
-    parent
-        .spawn(Node {
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            column_gap: Val::Px(6.0),
-            ..Default::default()
-        })
-        .with_children(|row| {
-            // Colored square as icon (avoids emoji rendering issues)
-            row.spawn((
-                Node {
-                    width: Val::Px(12.0),
-                    height: Val::Px(12.0),
-                    ..Default::default()
-                },
-                BackgroundColor(icon_color),
-            ));
-            // Label
-            row.spawn((
-                Text::new(label),
-                TextFont {
-                    font_size: 13.0,
-                    ..Default::default()
-                },
-                TextColor(Color::WHITE),
-            ));
-            // Track
-            row.spawn((
-                Node {
-                    width: Val::Px(120.0),
-                    height: Val::Px(12.0),
-                    border: UiRect::all(Val::Px(2.0)),
-                    overflow: Overflow::clip(),
-                    ..Default::default()
-                },
-                BorderColor(border_color),
-                BackgroundColor(Color::srgba(0.05, 0.05, 0.05, 0.8)),
-            ))
-            .with_children(fill_fn);
+                });
+            });
         });
 }
 
@@ -269,7 +279,7 @@ pub fn update_weapon_hud(
         (With<FireballChargeFill>, Without<OrbCooldownFill>),
     >,
 ) {
-    let Ok(player) = player_query.get_single() else {
+    let Ok(player) = player_query.single() else {
         return;
     };
 
@@ -278,14 +288,14 @@ pub fn update_weapon_hud(
     let orb_duration = player.orb_timer.duration().as_secs_f32();
     let orb_pct = (orb_elapsed / orb_duration * 100.0).clamp(0.0, 100.0);
 
-    if let Ok((mut node, _)) = orb_query.get_single_mut() {
+    if let Ok((mut node, _)) = orb_query.single_mut() {
         node.width = Val::Percent(orb_pct);
     }
 
     // Fireball charge bar: charges / 5, turns bright orange when ready
     let charges = player.orb_charges;
     let charge_pct = f32::from(charges.min(5)) / 5.0 * 100.0;
-    if let Ok((mut node, mut bg)) = fb_query.get_single_mut() {
+    if let Ok((mut node, mut bg)) = fb_query.single_mut() {
         node.width = Val::Percent(charge_pct);
         *bg = if charges >= 5 {
             BackgroundColor(Color::srgb(1.0, 0.6, 0.0)) // bright gold = ready
@@ -298,7 +308,7 @@ pub fn update_weapon_hud(
 // ── Level-up ─────────────────────────────────────────────────────────────────
 
 pub fn transition_to_levelup(
-    mut ev_level_up: EventReader<LevelUpEvent>,
+    mut ev_level_up: MessageReader<LevelUpEvent>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
     for _ in ev_level_up.read() {
@@ -374,7 +384,7 @@ pub fn handle_skill_selection(
 ) {
     for (interaction, button) in &interaction_query {
         if *interaction == Interaction::Pressed {
-            if let Ok((mut player, mut health)) = player_query.get_single_mut() {
+            if let Ok((mut player, mut health)) = player_query.single_mut() {
                 if button.skill_id == 0 {
                     let new_duration = player.fireball_timer.duration().as_secs_f32() * 0.8;
                     player
@@ -393,7 +403,7 @@ pub fn handle_skill_selection(
             next_state.set(GameState::Playing);
 
             for entity in &menu_query {
-                commands.entity(entity).despawn_recursive();
+                commands.entity(entity).despawn();
             }
         }
     }
@@ -466,7 +476,7 @@ pub fn handle_restart(
             next_state.set(GameState::Playing);
 
             for entity in &menu_query {
-                commands.entity(entity).despawn_recursive();
+                commands.entity(entity).despawn();
             }
 
             for entity in &enemy_query {
@@ -480,7 +490,7 @@ pub fn handle_restart(
             }
 
             if let Ok((mut player, mut health, mut stats, mut transform)) =
-                player_query.get_single_mut()
+                player_query.single_mut()
             {
                 health.0 = 100.0;
                 player

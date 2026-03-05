@@ -18,8 +18,7 @@ pub fn fire_fireballs(
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
-    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.get_single_mut()
-    {
+    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.single_mut() {
         player.fireball_timer.tick(time.delta());
 
         // Only fire when cooldown is done AND enough orb charges accumulated
@@ -93,8 +92,7 @@ pub fn fire_orbs(
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
-    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.get_single_mut()
-    {
+    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.single_mut() {
         player.orb_timer.tick(time.delta());
         if !player.orb_timer.just_finished() {
             return;

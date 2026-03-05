@@ -6,16 +6,16 @@ use crate::component::{
 };
 
 // Event to signal level up
-#[derive(Event)]
+#[derive(Message)]
 pub struct LevelUpEvent;
 
 pub fn collect_gems(
     mut commands: Commands,
     mut player_query: Query<(&Transform, &mut PlayerStats), With<Player>>,
     gem_query: Query<(Entity, &Transform, &ExperienceGem)>,
-    mut ev_level_up: EventWriter<LevelUpEvent>,
+    mut ev_level_up: MessageWriter<LevelUpEvent>,
 ) {
-    if let Ok((player_transform, mut player_stats)) = player_query.get_single_mut() {
+    if let Ok((player_transform, mut player_stats)) = player_query.single_mut() {
         let magnet_radius = 150.0;
         let collect_radius = 30.0;
 
@@ -39,7 +39,7 @@ pub fn collect_gems(
                     player_stats.level += 1;
                     player_stats.current_xp -= player_stats.required_xp;
                     player_stats.required_xp *= 1.5; // Scale next level requirement
-                    ev_level_up.send(LevelUpEvent);
+                    ev_level_up.write(LevelUpEvent);
                     info!("Level Up! Now level {}", player_stats.level);
                 }
             }

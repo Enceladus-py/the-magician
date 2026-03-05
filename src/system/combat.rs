@@ -33,7 +33,7 @@ pub fn handle_enemy_player_collisions(
     mut player_query: Query<(&Transform, &mut Health), (With<Player>, Without<Enemy>)>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
-    if let Ok((player_transform, mut player_health)) = player_query.get_single_mut() {
+    if let Ok((player_transform, mut player_health)) = player_query.single_mut() {
         for enemy_transform in &enemy_query {
             let distance = player_transform
                 .translation
