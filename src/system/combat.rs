@@ -1,9 +1,13 @@
 use bevy::prelude::*;
 
-use crate::component::{
-    enemy::Enemy, experience::ExperienceGem, health::Health, player::Player, spell::Spell,
+use crate::{
+    component::{
+        enemy::Enemy, experience::ExperienceGem, health::Health, player::Player, spell::Spell,
+    },
+    GameState,
 };
 
+#[allow(clippy::type_complexity)]
 pub fn handle_spell_collisions(
     mut commands: Commands,
     spell_query: Query<(Entity, &Transform, &Spell), (Without<Enemy>, Without<Player>)>,
@@ -24,6 +28,7 @@ pub fn handle_spell_collisions(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn handle_enemy_player_collisions(
     mut player_query: Query<(&Transform, &mut Health), (With<Player>, Without<Enemy>)>,
     enemy_query: Query<&Transform, With<Enemy>>,
@@ -40,12 +45,25 @@ pub fn handle_enemy_player_collisions(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub fn handle_death(
     mut commands: Commands,
-    query: Query<(Entity, &Health, Option<&Transform>, Option<&Enemy>)>,
+    query: Query<(
+        Entity,
+        &Health,
+        Option<&Transform>,
+        Option<&Enemy>,
+        Option<&Player>,
+    )>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
-    for (entity, health, opt_transform, opt_enemy) in &query {
+    for (entity, health, opt_transform, opt_enemy, opt_player) in &query {
         if health.0 <= 0.0 {
+            if opt_player.is_some() {
+                next_state.set(GameState::GameOver);
+                return;
+            }
+
             commands.entity(entity).despawn();
 
             if opt_enemy.is_some() {

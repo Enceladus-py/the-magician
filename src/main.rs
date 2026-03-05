@@ -10,7 +10,10 @@ use system::{
     movement::{move_fireballs, move_orbs, move_player},
     spawn::{fire_fireballs, fire_orbs},
     startup::setup,
-    ui::{handle_skill_selection, spawn_levelup_menu, transition_to_levelup},
+    ui::{
+        handle_restart, handle_skill_selection, spawn_gameover_menu, spawn_levelup_menu,
+        transition_to_levelup,
+    },
 };
 
 mod component;
@@ -61,5 +64,7 @@ fn main() {
             Update,
             handle_skill_selection.run_if(in_state(GameState::LevelUp)),
         )
+        .add_systems(OnEnter(GameState::GameOver), spawn_gameover_menu)
+        .add_systems(Update, handle_restart.run_if(in_state(GameState::GameOver)))
         .run();
 }
