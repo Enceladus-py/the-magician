@@ -30,4 +30,5 @@ pub struct PlayerAnimation {
     pub timer: Timer,
     pub last_frame: usize,
     pub first_frame: usize,
+    pub attack_timer: Timer,
 }

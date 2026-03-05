@@ -13,12 +13,13 @@ const ORB_CHARGES_NEEDED: u8 = 5;
 pub fn fire_fireballs(
     time: Res<Time>,
     mut commands: Commands,
-    mut player_query: Query<(&Transform, &Sprite, &PlayerAnimation, &mut Player)>,
+    mut player_query: Query<(&Transform, &Sprite, &mut PlayerAnimation, &mut Player)>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
-    if let Ok((player_transform, sprite, _anim, mut player)) = player_query.get_single_mut() {
+    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.get_single_mut()
+    {
         player.fireball_timer.tick(time.delta());
 
         // Only fire when cooldown is done AND enough orb charges accumulated
@@ -26,6 +27,14 @@ pub fn fire_fireballs(
             return;
         }
         player.orb_charges = 0;
+
+        // Set attack animation
+        animation.first_frame = 36;
+        animation.last_frame = 46;
+        animation
+            .attack_timer
+            .set_duration(std::time::Duration::from_secs_f32(0.4));
+        animation.attack_timer.reset();
 
         // Aim at nearest enemy
         let Some(enemy_transform) = nearest_enemy(player_transform.translation, &enemy_query)
@@ -79,16 +88,25 @@ pub fn fire_fireballs(
 pub fn fire_orbs(
     time: Res<Time>,
     mut commands: Commands,
-    mut player_query: Query<(&Transform, &Sprite, &PlayerAnimation, &mut Player)>,
+    mut player_query: Query<(&Transform, &Sprite, &mut PlayerAnimation, &mut Player)>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
-    if let Ok((player_transform, sprite, _anim, mut player)) = player_query.get_single_mut() {
+    if let Ok((player_transform, sprite, mut animation, mut player)) = player_query.get_single_mut()
+    {
         player.orb_timer.tick(time.delta());
         if !player.orb_timer.just_finished() {
             return;
         }
+
+        // Set attack animation
+        animation.first_frame = 60;
+        animation.last_frame = 64;
+        animation
+            .attack_timer
+            .set_duration(std::time::Duration::from_secs_f32(0.3));
+        animation.attack_timer.reset();
 
         // Increment charge toward fireball
         player.orb_charges = player.orb_charges.saturating_add(1);

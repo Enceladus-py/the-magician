@@ -54,13 +54,17 @@ pub fn move_player(
 
             player.facing_direction = facing_direction;
 
-            // Change to running animation
-            animation.first_frame = 12;
-            animation.last_frame = 17;
+            // Only change to running animation if not attacking
+            if animation.attack_timer.finished() {
+                animation.first_frame = 12;
+                animation.last_frame = 17;
+            }
         } else {
-            // Change to idle animation
-            animation.first_frame = 0;
-            animation.last_frame = 3;
+            // Only change to idle animation if not attacking
+            if animation.attack_timer.finished() {
+                animation.first_frame = 0;
+                animation.last_frame = 3;
+            }
         }
 
         // Update the camera's position to follow the player

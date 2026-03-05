@@ -45,6 +45,7 @@ pub fn setup(
             timer: Timer::from_seconds(0.1, TimerMode::Repeating),
             first_frame: 0,
             last_frame: 3,
+            attack_timer: Timer::from_seconds(0.0, TimerMode::Once),
         },
     ));
 
