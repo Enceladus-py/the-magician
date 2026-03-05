@@ -168,38 +168,50 @@ pub fn spawn_weapon_hud(mut commands: Commands) {
         })
         .with_children(|root| {
             // ── Orb card ───────────────────────────────────────────────────
-            weapon_card(root, "🔵 ORB", Color::srgb(0.2, 0.5, 1.0), |track| {
-                track.spawn((
-                    Node {
-                        width: Val::Percent(100.0),
-                        height: Val::Percent(100.0),
-                        ..Default::default()
-                    },
-                    BackgroundColor(Color::srgb(0.2, 0.55, 1.0)),
-                    OrbCooldownFill,
-                ));
-            });
+            weapon_card(
+                root,
+                "ORB",
+                Color::srgb(0.2, 0.55, 1.0),
+                Color::srgb(0.2, 0.5, 1.0),
+                |track| {
+                    track.spawn((
+                        Node {
+                            width: Val::Percent(100.0),
+                            height: Val::Percent(100.0),
+                            ..Default::default()
+                        },
+                        BackgroundColor(Color::srgb(0.2, 0.55, 1.0)),
+                        OrbCooldownFill,
+                    ));
+                },
+            );
 
             // ── Fireball card ──────────────────────────────────────────────
-            weapon_card(root, "🔥 FIREBALL", Color::srgb(0.5, 0.2, 0.1), |track| {
-                track.spawn((
-                    Node {
-                        width: Val::Percent(0.0),
-                        height: Val::Percent(100.0),
-                        ..Default::default()
-                    },
-                    BackgroundColor(Color::srgb(1.0, 0.4, 0.05)),
-                    FireballChargeFill,
-                ));
-            });
+            weapon_card(
+                root,
+                "FIREBALL",
+                Color::srgb(1.0, 0.4, 0.05),
+                Color::srgb(0.5, 0.2, 0.1),
+                |track| {
+                    track.spawn((
+                        Node {
+                            width: Val::Percent(0.0),
+                            height: Val::Percent(100.0),
+                            ..Default::default()
+                        },
+                        BackgroundColor(Color::srgb(1.0, 0.4, 0.05)),
+                        FireballChargeFill,
+                    ));
+                },
+            );
         });
 }
 
-/// Spawns one weapon card row: label + a 140×12 track whose children are
-/// filled by the provided closure.
+/// Spawns one weapon card row: colored-square icon + label + a 140x12 bar track.
 fn weapon_card(
     parent: &mut ChildBuilder,
     label: &str,
+    icon_color: Color,
     border_color: Color,
     fill_fn: impl FnOnce(&mut ChildBuilder),
 ) {
@@ -207,10 +219,20 @@ fn weapon_card(
         .spawn(Node {
             flex_direction: FlexDirection::Row,
             align_items: AlignItems::Center,
-            column_gap: Val::Px(8.0),
+            column_gap: Val::Px(6.0),
             ..Default::default()
         })
         .with_children(|row| {
+            // Colored square as icon (avoids emoji rendering issues)
+            row.spawn((
+                Node {
+                    width: Val::Px(12.0),
+                    height: Val::Px(12.0),
+                    ..Default::default()
+                },
+                BackgroundColor(icon_color),
+            ));
+            // Label
             row.spawn((
                 Text::new(label),
                 TextFont {
@@ -222,7 +244,7 @@ fn weapon_card(
             // Track
             row.spawn((
                 Node {
-                    width: Val::Px(140.0),
+                    width: Val::Px(120.0),
                     height: Val::Px(12.0),
                     border: UiRect::all(Val::Px(2.0)),
                     overflow: Overflow::clip(),
