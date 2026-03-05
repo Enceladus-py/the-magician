@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use system::{
     animation::animate_sprite,
     combat::{handle_death, handle_enemy_player_collisions, handle_spell_collisions},
-    enemy::{EnemySpawnTimer, move_enemies, spawn_enemies},
+    enemy::{EnemySpawnTimer, GameTimer, move_enemies, spawn_enemies},
     experience::{LevelUpEvent, collect_gems},
     movement::{move_fireballs, move_orbs, move_player},
     spawn::{fire_fireballs, fire_orbs},
@@ -35,6 +35,7 @@ fn main() {
         .insert_resource(ClearColor(Color::srgb(0.1, 0.1, 0.1)))
         .add_event::<LevelUpEvent>()
         .init_resource::<EnemySpawnTimer>()
+        .init_resource::<GameTimer>()
         .init_state::<GameState>()
         .add_systems(Startup, setup)
         .add_systems(
