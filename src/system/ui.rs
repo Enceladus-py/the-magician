@@ -167,7 +167,7 @@ pub fn spawn_gameover_menu(mut commands: Commands) {
         });
 }
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn handle_restart(
     interaction_query: Query<&Interaction, (Changed<Interaction>, With<RestartButton>)>,
     mut next_state: ResMut<NextState<GameState>>,
