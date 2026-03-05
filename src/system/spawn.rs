@@ -20,8 +20,8 @@ pub fn fire_fireballs(
         (player_query.get_single_mut(), enemy_query.get_single())
     {
         player.fireball_timer.tick(time.delta());
-        if player.fireball_timer.just_finished() {
-            if matches!(player_animation.attack_mode, PlayerAttackMode::None) {
+        if player.fireball_timer.just_finished()
+            && matches!(player_animation.attack_mode, PlayerAttackMode::None) {
                 player_animation.attack_mode = PlayerAttackMode::Fireball;
                 player_animation.first_frame = 36;
                 player_animation.last_frame = 46;
@@ -73,7 +73,6 @@ pub fn fire_fireballs(
                     Spell { damage: 10.0 },
                 ));
             }
-        }
     }
 }
 
@@ -88,8 +87,8 @@ pub fn fire_orbs(
         player_query.get_single_mut()
     {
         player.orb_timer.tick(time.delta());
-        if player.orb_timer.just_finished() {
-            if matches!(player_animation.attack_mode, PlayerAttackMode::None) {
+        if player.orb_timer.just_finished()
+            && matches!(player_animation.attack_mode, PlayerAttackMode::None) {
                 player_animation.attack_mode = PlayerAttackMode::Orb;
                 player_animation.first_frame = 60;
                 player_animation.last_frame = 64;
@@ -125,6 +124,5 @@ pub fn fire_orbs(
                     Spell { damage: 15.0 },
                 ));
             }
-        }
     }
 }

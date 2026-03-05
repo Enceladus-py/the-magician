@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::component::{
     camera::MainCamera,
     enemy::Enemy,
+    health::Health,
     player::{Player, PlayerAnimation, PlayerAttackMode},
 };
 
@@ -37,6 +38,7 @@ pub fn setup(
             facing_direction: Vec2::new(1.0, 0.0), // facing right
             ..Default::default()
         },
+        Health(100.0),
         PlayerAnimation {
             timer: Timer::from_seconds(0.1, TimerMode::Repeating),
             first_frame: 0,
